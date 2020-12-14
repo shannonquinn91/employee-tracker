@@ -26,3 +26,5 @@ manager_id integer,
 foreign key (role_id) references role (id),
 foreign key (manager_id) references role (id)
 );
+
+
