@@ -51,7 +51,7 @@ function questionUser () {
     })
 }
 
-//Query Functions Below
+//Functions
 //============================================================================
 
 //Function to allow user to view employees
@@ -113,21 +113,79 @@ function addNewEmployee () {
 function updateRole () {
     connection.query("SELECT * FROM employee", function (err, results) {
         if (err) throw err;
+        //Used reduce method to restructure data for better user function
+        const employeesList = results.reduce((accumulator, element) => {
+            var firstName = element.first_name;
+            var lastName = element.last_name;
+            var id = element.id;
+            var roleID = element.role_id;
+            var managerID = element.manager_id;
+            var fullName = `${firstName} ${lastName}`; 
+            accumulator[fullName] = {
+                id,
+                firstName,
+                lastName,
+                roleID,
+                managerID
+            }
+            accumulator.choices.push(fullName);
+            return accumulator;
+        }, { choices: [] });
+
         inquirer.prompt([
             {
-                name: "choose",
+                name: "update",
                 type: "rawlist",
-                choices: function () {
-                    var employeeArray = [];
-                    for (var i = 0; i < results.length; i++) {
-                        employeeArray.push(results[i].first_name + " " + results[i].last_name);
-                    }
-                    return employeeArray;
-                },
+                choices: employeesList.choices,
                 message: "Which employee would you like to update?"
             }
         ]).then((response) => {
-            console.log(response);
+            let employeeToUpdate = response.update;
+            console.log(employeesList[employeeToUpdate]);
+            let employeeCurrentRole = employeesList[employeeToUpdate].roleID;
+            console.log(`The current role for ${employeeToUpdate} is ${employeeCurrentRole}`);
+            
+            connection.query("SELECT * FROM role", function(err, res) {
+                if (err) throw err;
+                const roleList = res.reduce((accumulator, element) => {
+                    var roleNum = element.id;
+                    var roleTitle = element.title;
+                    accumulator[roleTitle] = {
+                        roleNum,
+                        roleTitle
+                    }
+                    accumulator.roles.push(roleTitle);
+                    return accumulator;
+                }, {roles: []});
+
+                inquirer.prompt([
+                    {
+                        name: "newRole",
+                        type: "rawlist",
+                        choices: roleList.roles,
+                        message: "What is the employees new role?"
+                    }
+                ]). then((response) => {
+                    console.log(response.newRole)
+                    //Not working correctly
+                    connection.query(`SELECT * FROM role WHERE title = "${response.newRole}"`, function (err, res) {
+                        if (err) throw err;
+                        let newRoleID = res[0].id;
+                        connection.query(`UPDATE employee SET ? WHERE first_name = ${firstName} and last_name = ${lastName}`, 
+                        [
+                            {
+                                role_id: newRoleID
+                            }
+                        ],
+                        function(err) {
+                            if (err) throw err;
+                            console.log("Role successfully changed")
+                            console.log()
+                            connection.end();
+                        })
+                    })
+                })
+            }) 
         })
             
     })
