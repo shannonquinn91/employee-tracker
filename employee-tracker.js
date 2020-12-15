@@ -32,7 +32,8 @@ function questionUser () {
             "View all employees by role",
             "Add a new employee",
             "Update employee role",
-            "Update employee manager"
+            "Update employee manager",
+            "Exit Employee Tracker"
         ]
     }]).then((response) => {
         if (response.action === "View all employees") {
@@ -47,7 +48,10 @@ function questionUser () {
             updateRole();
         } else if (response.action === "Update employee manager") {
             //run function to update an employee entry
+        } else if (response.action === "Exit Employee Tracker") {
+            connection.end();
         }
+
     })
 }
 
@@ -60,7 +64,7 @@ function viewEmployees () {
     connection.query("SELECT * FROM employee", function(err, res) {
         if (err) throw err;
         console.table(res);
-        connection.end();
+        questionUser();
     })
 }
 
@@ -143,6 +147,7 @@ function updateRole () {
             let employeeToUpdate = response.update;
             console.log(employeesList[employeeToUpdate]);
             let employeeCurrentRole = employeesList[employeeToUpdate].roleID;
+            let employeeToUpdateID = employeesList[employeeToUpdate].id;
             console.log(`The current role for ${employeeToUpdate} is ${employeeCurrentRole}`);
             
             connection.query("SELECT * FROM role", function(err, res) {
@@ -163,25 +168,35 @@ function updateRole () {
                         name: "newRole",
                         type: "rawlist",
                         choices: roleList.roles,
-                        message: "What is the employees new role?"
+                        message: `What is ${employeeToUpdate}'s new role?`
                     }
-                ]). then((response) => {
-                    console.log(response.newRole)
-                    //Not working correctly
+                ]).then((response) => {
+                    //console.log(response.newRole)
                     connection.query(`SELECT * FROM role WHERE title = "${response.newRole}"`, function (err, res) {
                         if (err) throw err;
+                        //console.log(res[0].id);
                         let newRoleID = res[0].id;
-                        connection.query(`UPDATE employee SET ? WHERE first_name = ${firstName} and last_name = ${lastName}`, 
-                        [
-                            {
-                                role_id: newRoleID
-                            }
-                        ],
-                        function(err) {
+                        let newRoleTitle = res[0].title;
+                        connection.query(`
+                        SELECT role.id, role.title, employee.role_id, employee.id, employee.first_name, employee.last_name
+                        FROM role
+                        INNER JOIN employee ON role.id = employee.role_id
+                        WHERE employee.id = ${employeeToUpdateID}`,
+                        function (err, res) {
                             if (err) throw err;
-                            console.log("Role successfully changed")
-                            console.log()
-                            connection.end();
+                            //console.table(res);
+                            connection.query(`UPDATE employee SET ? WHERE id = ${employeeToUpdateID}`, 
+                            [
+                                {
+                                    role_id: newRoleID
+                                }
+                            ],
+                            function(err) {
+                                if (err) throw err;
+                                console.log(`${employeeToUpdate}'s role has been changed to ${newRoleTitle}`)
+                                console.log()
+                                questionUser();
+                            })
                         })
                     })
                 })

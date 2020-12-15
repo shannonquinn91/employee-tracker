@@ -17,6 +17,7 @@ values ("Reception");
 insert into department(name)
 values ("Warehouse");
 
+use employee_DB;
 insert into role (title, salary, department_id)
 values("CFO", 100000.00, 1);
 insert into role (title, salary, department_id)
@@ -44,42 +45,45 @@ values ("Foreman", 55000.00, 8);
 insert into role (title, salary, department_id)
 values ("Warehouse Assistant", 50000.00, 8);
 
+use employee_DB;
 insert into employee (first_name, last_name, role_id)
 values ("David", "Wallace", 1);
 insert into employee (first_name, last_name, role_id, manager_id)
 values ("Jan", "Gould", 2, 1);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Michael", "Scott", 4, 1);
+values ("Michael", "Scott", 3, 1);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Dwight K.", "Schrute", 5, 4);
+values ("Dwight K.", "Schrute", 5, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Jim", "Halpert", 5, 4);
+values ("Jim", "Halpert", 4, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Andy", "Bernard", 5, 4);
+values ("Andy", "Bernard", 4, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Phyllis", "Lapin-Vance", 5, 4);
+values ("Phyllis", "Lapin-Vance", 4, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Stanley", "Hudson", 5, 4);
+values ("Stanley", "Hudson", 4, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Angela", "Martin", 6, 4);
+values ("Angela", "Martin", 5, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Kevin", "Malone", 7, 4);
+values ("Kevin", "Malone", 6, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Oscar", "Martinez", 7, 4);
+values ("Oscar", "Martinez", 6, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Creed", "Bratton", 9, 4);
+values ("Toby", "Flenderson", 7, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Meredith", "Palmer", 11, 4);
+values ("Holly", "Flax", 7, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Kelly", "Kapoor", 10, 4);
+values ("Creed", "Bratton", 8, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Toby", "Flenderson", 8, 4);
+values ("Kelly", "Kapoor", 9, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Holly", "Flax", 8, 4);
+values ("Meredith", "Palmer", 10, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Pam", "Beesly", 12, 4);
+values ("Pam", "Beesly", 11, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Erin", "Hannon", 12, 4);
+values ("Erin", "Hannon", 11, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Darryl", "Philbin", 13, 4);
+values ("Darryl", "Philbin", 12, 3);
+insert into employee (first_name, last_name, role_id, manager_id)
+values ("Roy", "Anderson", 13, 3);
 
