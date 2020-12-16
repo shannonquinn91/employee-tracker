@@ -47,7 +47,7 @@ function questionUser () {
         } else if (response.action === "Update employee role") {
             updateRole();
         } else if (response.action === "Update employee manager") {
-            //run function to update an employee entry
+            updateManager();
         } else if (response.action === "Exit Employee Tracker") {
             connection.end();
         }
@@ -74,8 +74,9 @@ function viewByDepartment () {};
 //Function to allow user to view employees by roles
 function viewByRoles () {};
 
-//Function to allow user to add employees
+//Function to allow user to add employees (go back and make dynamic choices)
 function addNewEmployee () {
+    //Change query
     inquirer.prompt([
         {
             name: "first_name",
@@ -88,31 +89,35 @@ function addNewEmployee () {
             message: "What is the new employees last name?"
         },
         {
-            name: "role_id",
+            name: "role_title",
             type: "list",
-            message: "What is the new employees role id?",
-            choices: [101, 102, 103, 104]
-        },
-        {
-            name: "manager_id",
-            type: "list",
-            message: "What is the new employees manager id?",
-            choices: [001, 002, 003, 004]
+            message: "What is the new employees role?",
+            choices: ["CFO", "VP", "Regional Manager", "Sales Representative", "Senior Accountant", "Accountant", "HR Representative", "Quality Control", "CS Representative", "Supplier Relations", "Receptionist", "Foreman", "Warehouse Assistant"]
         }
-    ]).then((response) => {
-        connection.query("INSERT INTO employee SET ?",
-        {
-            first_name: response.first_name,
-            last_name: response.last_name,
-            role_id: response.role_id,
-            manager_id: response.manager_id
-        }, function (err) {
-            if (err) throw err;
-            console.log("New employee added successfully")
-            questionUser();
+        ]).then((response) => {
+        //console.log(response)
+        connection.query(`SELECT * FROM role WHERE title = "${response.role_title}"`,
+            function (err, res) {
+                if (err) throw err;
+                //console.log(res[0].id)
+                let newEmpRoleID = res[0].id;
+                connection.query("INSERT INTO employee SET ?",
+                {
+                    first_name: response.first_name,
+                    last_name: response.last_name,
+                    role_id: newEmpRoleID
+                }, function (err) {
+                    if (err) throw err;
+                    console.log("New employee added successfully.");
+                    questionUser();
+                })
+            
+            })
+        
         })
-    })
 };
+
+
 //Function to allow user to update an employees role
 function updateRole () {
     connection.query("SELECT * FROM employee", function (err, results) {
@@ -135,7 +140,6 @@ function updateRole () {
             accumulator.choices.push(fullName);
             return accumulator;
         }, { choices: [] });
-
         inquirer.prompt([
             {
                 name: "update",
@@ -202,9 +206,12 @@ function updateRole () {
                 })
             }) 
         })
-            
-    })
-   
+    })         
+}
+
+//Function to update the manager of an employee
+function updateManager () {
+
 }
 //BONUS: view employees by manager
 //BONUS: view total utilized budget (combined salaries of employees in that dept)//Function to allow user to add departments
