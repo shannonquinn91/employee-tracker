@@ -53,7 +53,7 @@ values ("Jan", "Gould", 2, 1);
 insert into employee (first_name, last_name, role_id, manager_id)
 values ("Michael", "Scott", 3, 1);
 insert into employee (first_name, last_name, role_id, manager_id)
-values ("Dwight K.", "Schrute", 5, 3);
+values ("Dwight K.", "Schrute", 4, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
 values ("Jim", "Halpert", 4, 3);
 insert into employee (first_name, last_name, role_id, manager_id)
