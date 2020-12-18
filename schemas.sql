@@ -25,9 +25,9 @@ id integer auto_increment,
 first_name varchar(30),
 last_name varchar(30),
 role_id int,
-manager_id int,
+manager_id int default 1,
 foreign key (role_id) references role(id),
-foreign key (manager_id) references role(id),
+-- foreign key (manager_id) references role(id),
 primary key (id)
 );
 
