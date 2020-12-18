@@ -100,48 +100,98 @@ function viewByRoles () {
                 )
             })
         })
-    };
+};
     
-    //Function to allow user to add employees (go back and make dynamic choices)
-    function addNewEmployee () {
-    inquirer.prompt([
-        {
-            name: "first_name",
-            type: "input",
-            message: "What is the new employees first name?"
-        },
-        {
-            name: "last_name",
-            type: "input",
-            message: "What is the new employees last name?"
-        },
-        {
-            name: "role_title",
-            type: "list",
-            message: "What is the new employees role?",
-            choices: ["CFO", "VP", "Regional Manager", "Sales Representative", "Senior Accountant", "Accountant", "HR Representative", "Quality Control", "CS Representative", "Supplier Relations", "Receptionist", "Foreman", "Warehouse Assistant"]
+//Function to allow user to add employees
+function addNewEmployee () {
+    connection.query("SELECT * FROM department", function(err, res) {
+        if (err) throw err;
+        let deptArray = [];
+        let deptIDArray = [];
+        for (let i = 0; i < res.length; i++) {
+            deptArray.push(res[i].name);
+            deptIDArray.push(res[i].id);
         }
-        ]).then((response) => {
-        //console.log(response)
-        connection.query(`SELECT * FROM role WHERE title = "${response.role_title}"`,
-            function (err, res) {
+        //console.log(deptIDArray);
+        connection.query("SELECT * FROM role", function(err, res) {
+            if (err) throw err;
+            let roleArray = [];
+            let roleIDArray = [];
+            for (let i = 0; i < res.length; i++) {
+                roleArray.push(res[i].title);
+                roleIDArray.push(res[i].id);
+            }
+            //console.log(roleIDArray);
+            //console.log(roleArray);
+            connection.query("SELECT * FROM employee", function(err, res) {
                 if (err) throw err;
-                //console.log(res[0].id)
-                let newEmpRoleID = res[0].id;
-                connection.query("INSERT INTO employee SET ?",
-                {
-                    first_name: response.first_name,
-                    last_name: response.last_name,
-                    role_id: newEmpRoleID
-                }, function (err) {
-                    if (err) throw err;
-                    console.log("New employee added successfully.");
-                    updateManager();
+                let employeeFullNames = [];
+                let employeeID = [];
+                for (let i = 0; i < res.length; i++) {
+                    employeeFullNames.push(res[i].first_name + " " + res[i].last_name);
+                    employeeID.push(res[i].id);
+                }
+                //console.log(employeeNames);
+                //console.log(employeeID);
+                inquirer.prompt([
+                    {
+                        name: "newFirstName",
+                        type: "input",
+                        message: "What is the new employees first name?"
+                    },
+                    {
+                        name: "newLastName",
+                        type: "input",
+                        message: "What is the new employees last name?"
+                    },
+                    {
+                        name: "newRole",
+                        type: "list",
+                        message: "What is the new employees role?",
+                        choices: roleArray
+                    },
+                    {
+                        name: "newManager",
+                        type: "list",
+                        message: "Who is the new employees manager?",
+                        choices: employeeFullNames
+                    }
+                ]).then((responses) => {
+                    //console.log(responses);
+                    const newFirstName = responses.newFirstName;
+                    const newLastName = responses.newLastName;
+                    const newRoleTitle = responses.newRole;
+                    const newManager = responses.newManager;
+                    connection.query(
+                        "INSERT INTO employee SET ?",
+                        {
+                            first_name: newFirstName,
+                            last_name: newLastName
+                        },
+                        function(err) {
+                            if (err) throw err;
+                            connection.query(
+                                `SELECT * FROM role WHERE title = "${newRoleTitle}"`,
+                                function(err, res) {
+                                    if (err) throw err;
+                                    console.log(res);
+                                    const newRoleID = res[0].id;
+                                    connection.query(
+                                        `UPDATE employee SET role_id = ${newRoleID} WHERE first_name = "${newFirstName}" and last_name = "${newLastName}"`,
+                                        function(err) {
+                                            if (err) throw err;
+                                            console.log(`You have successfully added ${newFirstName} ${newLastName} as a new ${newRoleTitle}. By default, the new employee has no manager. Please select "Update employee manager" to update this information.`);
+                                            questionUser();
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    )
                 })
-            
-            })
-        
+            }) 
         })
+    })
 };
 
 
@@ -310,84 +360,6 @@ function addNewRole() {
 //Function to update the manager of an employee
 //Function not working as expected
 function updateManager () {
-    connection.query("SELECT employee.*, role.id, role.title FROM employee INNER JOIN role WHERE role.id = employee.role_id",
-    function(err, res) {
-        if (err) throw err;
-        //console.log(res);
-        const employeesList = res.reduce((accumulator, element) => {
-            var firstName = element.first_name;
-            var lastName = element.last_name;
-            var id = element.id;
-            var roleID = element.role_id;
-            var managerID = element.manager_id
-            var fullName = `${firstName} ${lastName}`; 
-            accumulator[fullName] = {
-                id,
-                firstName,
-                lastName,
-                roleID,
-                managerID
-            }
-            accumulator.choices.push(fullName);
-            return accumulator;
-        }, { choices: [] });
-        inquirer.prompt([
-            {
-                name: "employee",
-                type: "rawlist",
-                message: "Which employee needs a change in manager?",
-                choices: employeesList.choices
-            }
-        ]).then((response) => {
-            //console.log(response);
-            let employeeToChange = response.employee;
-            let employeeToChangeID = employeesList[employeeToChange].id;
-            let currentManagerID = employeesList[employeeToChange].managerID;
-            //console.log(currentManagerID);
-            connection.query(
-                `SELECT * FROM employee WHERE id = (${currentManagerID})`, 
-                function (err, res) {
-                    if (err) throw (err);
-                    let currentManagerName = res[0].first_name + " " + res[0].last_name;
-                    console.log(`The current manager for ${employeeToChange} is ${currentManagerName}`);
-    
-                inquirer.prompt([
-                {
-                    name: "newManager",
-                    type: "rawlist",
-                    message: `Who is ${employeeToChange}'s new manager?`,
-                    choices: employeesList.choices
-                }
-            ]).then((response) => {
-                let newManager = response.newManager;
-                let newManagerID = employeesList[newManager].id
-                console.log(newManagerID);
-                connection.query(
-                    `SELECT * FROM employee WHERE id = ${employeeToChangeID}`,
-                    function (err, res) {
-                        if (err) throw err;
-                        //console.log(res);
-                        connection.query(
-                            `UPDATE employee SET ? WHERE id = ${employeeToChangeID}`, 
-                            [
-                            {
-                                manager_id: newManagerID
-                            }
-                            ], 
-                            function(err) {
-                                if (err) throw err;
-                                console.log(`The manager for ${employeeToChange} has been updated to ${newManager}.`)
-                                questionUser();
-                            }
-                        )
-                    }
-
-                )
-            })
-        }) 
-        })
-    }
-    )
 }
 //BONUS: view employees by manager
 //BONUS: view total utilized budget (combined salaries of employees in that dept)//Function to allow user to add departments
