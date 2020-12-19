@@ -373,6 +373,6 @@ function updateManager () {
     })
 }
 //BONUS: view employees by manager
-//BONUS: view total utilized budget (combined salaries of employees in that dept)//Function to allow user to add departments
+//BONUS: view total utilized budget (combined salaries of employees in that dept)
 //BONUS: update employee managers
 //BONUS: Delete departments, roles, employees
