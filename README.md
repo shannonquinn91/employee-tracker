@@ -20,13 +20,13 @@
   ## Code Explanation
   This code starts by requiring the npm packages for mysql and inquirer. Then it connects to the sql database using the createConnection method. 
 
-  The first funciton that runs in the application questions the user on what action they would like to take. Based on the action the user chooses, another function is run that corresponds to the choice of the user. 
+  The first function that runs in the application questions the user on what action they would like to take. Based on the action the user chooses, another function is run that corresponds to the choice of the user. 
 
   The functions written query the sql database at least once using SELECT, INSERT INTO, or UPDATE statements, depending on what the user wanted to do. 
   
 
   ## Video Walkthrough
-  Insert link of video here
+  https://drive.google.com/drive/u/0/folders/1nFqdlIFAcmDRm1h6UUb6CCuF963U1R5k
   
   
   ## Contact Me

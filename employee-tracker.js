@@ -164,7 +164,7 @@ function addNewEmployee () {
                                     `UPDATE employee SET role_id = ${newRoleID} WHERE first_name = "${newFirstName}" and last_name = "${newLastName}"`,
                                     function(err) {
                                         if (err) throw err;
-                                        console.log(`You have successfully added ${newFirstName} ${newLastName} as a new ${newRoleTitle}. By default, the new employee has no manager. Please select "Update employee manager" to update this information.`);
+                                        console.log(`You have successfully added ${newFirstName} ${newLastName} as a new ${newRoleTitle}. By default, the new employees manager is the CFO. Please select "Update employee manager" to update this information.`);
                                         questionUser();
                                     }
                                 )
@@ -280,9 +280,10 @@ function addNewDept() {
     ]).then((response) => {
         let newDeptName = response.newDept;
         connection.query(
-            `INSERT INTO department(name) VALUES(${newDeptName})`, function(err) {
+            `INSERT INTO department(name) VALUES("${newDeptName}")`, function(err) {
                 if (err) throw (err);
                 console.log(`You have successfully added ${newDeptName}.`)
+                questionUser();
             }
         )
     })
