@@ -26,7 +26,7 @@
   
 
   ## Video Walkthrough
-  https://drive.google.com/drive/u/0/folders/1nFqdlIFAcmDRm1h6UUb6CCuF963U1R5k
+  https://drive.google.com/file/d/1VvbruoBUXjGBV5qkR1vGl1CsK5L6R2wj/view?usp=sharing
   
   
   ## Contact Me
